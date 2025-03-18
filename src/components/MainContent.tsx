@@ -5,18 +5,19 @@ interface Header {
   name: string;
 }
 interface Item {
-  profile_picture: string;
-  first_name: string;
-  last_name: string;
+  id: number;
+  image: string;
+  firstName: string;
+  lastName: string;
   gender: string;
-  birthday: Date;
+  birthDate: Date;
 }
 export default function MainContent() {
   const navigate = useNavigate();
   const [headers, setHeader] = useState<Header[]>([]);
   const [items, setItem] = useState<Item[]>([]);
   const [searchWord, setSearch] = useState<string>('');
-  const [loading, setLoading] = useState<boolean>(false);
+  const [isLoading, setLoading] = useState<boolean>(false);
   useEffect(() => {
     const defaultHeaders = [
       { key: 'profile_picture', name: 'Profile Picture' },
@@ -43,7 +44,6 @@ export default function MainContent() {
         throw new Error('Network response was not ok');
       }
       const { users } = await response.json();
-      console.log(users);
       setItem(users);
     } catch (error) {
       console.log(error);
@@ -61,9 +61,40 @@ export default function MainContent() {
       onSearchSubmit();
     }
   };
-  const onSearchSubmit = () => {
-    console.log('search');
+  const onSearchSubmit = async () => {
+    if (!searchWord) {
+      await onGetUsers();
+    }
+
+    try {
+      setLoading(true);
+      const response = await fetch(`${import.meta.env.APP_BACKEND_URL}api/users/${searchWord}`);
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const { users } = await response.json();
+      setItem(users);
+    } catch (error) {
+      console.error('Error searching users:', error);
+    } finally {
+      setLoading(false);
+    }
   };
+
+  const onDeleteUser = async ({ id }: { id: number }) => {
+    try {
+      const response = await fetch(`${import.meta.env.APP_BACKEND_URL}api/users/${id}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      await onGetUsers();
+    } catch (error) {
+      console.error('Error deleting user:', error);
+    }
+  };
+
   return (
     <div className="max-w-[1280px] mx-auto px-2">
       <div className="flex items-center justify-between mt-5 w-full">
@@ -110,7 +141,7 @@ export default function MainContent() {
               ))}
             </tr>
           </thead>
-          {loading && (
+          {isLoading && (
             <tbody>
               <tr>
                 <td colSpan={headers.length} className="text-center">
@@ -122,7 +153,7 @@ export default function MainContent() {
             </tbody>
           )}
 
-          {!loading && items.length <= 0 && (
+          {!isLoading && items.length <= 0 && (
             <tbody>
               <tr>
                 <td colSpan={headers.length} className="text-center">
@@ -131,33 +162,46 @@ export default function MainContent() {
               </tr>
             </tbody>
           )}
-          {!loading && items.length > 0 && (
+          {!isLoading && items.length > 0 && (
             <tbody>
               {items.map((item, index) => (
                 <tr key={index}>
                   <td>
                     <div className="avatar avatar-placeholder">
                       <div className="bg-blue-600 text-neutral-content w-10 rounded-full">
-                        <span className="text-white">D</span>
+                        {item.image ? (
+                          <img
+                            src={item.image}
+                            alt="Profile"
+                            className="w-full h-full object-cover rounded-full"
+                          />
+                        ) : (
+                          <span className="text-white text-2xl">{item.firstName.slice(0, 2)}</span>
+                        )}
                       </div>
                     </div>
                   </td>
                   <td>
-                    <span>{item.first_name}</span>
+                    <span>{item.firstName}</span>
                   </td>
                   <td>
-                    <span>{item.last_name}</span>
+                    <span>{item.lastName}</span>
                   </td>
                   <td>
                     <span>{item.gender}</span>
                   </td>
                   <td>
-                    <span>{item.birthday.toLocaleDateString()}</span>
+                    <span>{new Date(item.birthDate).toLocaleDateString()}</span>
                   </td>
                   <td>
                     <div className="flex flex-wrap gap-2">
                       <button className="btn btn-warning text-white">Edit</button>
-                      <button className="btn btn-error text-white">Delete</button>
+                      <button
+                        className="btn btn-error text-white"
+                        onClick={() => onDeleteUser({ id: item.id })}
+                      >
+                        Delete
+                      </button>
                     </div>
                   </td>
                 </tr>

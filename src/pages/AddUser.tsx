@@ -64,12 +64,32 @@ export default function AddUser() {
     }
   };
 
-  const onSubmit = (e: React.FormEvent) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Here you would typically send the data to an API
-    console.log('Form submitted:', formData);
-    // Navigate back to the user list page
-    navigate('/');
+    try {
+      const userData = {
+        ...formData,
+        birthday: formData.birthday ? formData.birthday.toISOString().split('T')[0] : null,
+      };
+      const response = await fetch(`${import.meta.env.APP_BACKEND_URL}api/users`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create user');
+      }
+
+      navigate('/');
+    } catch (err) {
+      console.error('Error creating user:', err);
+      // setError(err instanceof Error ? err.message : 'An unknown error occurred');
+    } finally {
+      // setIsLoading(false);
+    }
   };
 
   const onCancel = () => {
