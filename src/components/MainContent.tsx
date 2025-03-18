@@ -100,7 +100,25 @@ export default function MainContent() {
       console.error('Error deleting user:', error);
     }
   };
+  const onEditUser = (item: Item) => {
+    if (!item.id) {
+      return;
+    }
 
+    // Navigate to the edit user page with the user data in state
+    navigate(`/edit-user/${item.id}`, {
+      state: {
+        userData: {
+          id: item.id,
+          image: item.image,
+          firstName: item.firstName,
+          lastName: item.lastName,
+          gender: item.gender,
+          birthDate: item.birthDate,
+        },
+      },
+    });
+  };
   return (
     <div className="max-w-[1280px] mx-auto px-2">
       <div className="flex items-center justify-between mt-5 w-full">
@@ -207,7 +225,12 @@ export default function MainContent() {
                   </td>
                   <td>
                     <div className="flex flex-wrap gap-2">
-                      <button className="btn btn-warning text-white">Edit</button>
+                      <button
+                        className="btn btn-warning text-white"
+                        onClick={() => onEditUser(item)}
+                      >
+                        Edit
+                      </button>
                       <button
                         className="btn btn-error text-white"
                         onClick={() => onDeleteUser({ id: item.id })}

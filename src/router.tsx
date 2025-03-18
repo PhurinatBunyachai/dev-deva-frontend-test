@@ -3,6 +3,7 @@ import App from './App';
 import Home from './pages/Home';
 import NotFound from './pages/NotFound';
 import AddUser from './pages/AddUser';
+import EditUser from './pages/EditUser';
 
 const router = createBrowserRouter([
   {
@@ -17,6 +18,10 @@ const router = createBrowserRouter([
       {
         path: 'add-user',
         element: <AddUser />,
+      },
+      {
+        path: 'edit-user/:id',
+        element: <EditUser />,
       },
       // Add more routes here as needed
     ],
