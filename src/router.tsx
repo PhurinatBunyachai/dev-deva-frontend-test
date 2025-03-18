@@ -7,7 +7,7 @@ import EditUser from './pages/EditUser';
 
 const router = createBrowserRouter([
   {
-    path: '/',
+    path: import.meta.env.APP_BASE_URL,
     element: <App />,
     errorElement: <NotFound />,
     children: [
