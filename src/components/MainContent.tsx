@@ -82,6 +82,12 @@ export default function MainContent() {
   };
 
   const onDeleteUser = async ({ id }: { id: number }) => {
+    if (!id) {
+      return;
+    }
+    if (!confirm('Are you sure?')) {
+      return;
+    }
     try {
       const response = await fetch(`${import.meta.env.APP_BACKEND_URL}api/users/${id}`, {
         method: 'DELETE',
@@ -191,7 +197,13 @@ export default function MainContent() {
                     <span>{item.gender}</span>
                   </td>
                   <td>
-                    <span>{new Date(item.birthDate).toLocaleDateString()}</span>
+                    <span>
+                      {new Date(item.birthDate).toLocaleDateString('en-GB', {
+                        day: 'numeric',
+                        month: 'short',
+                        year: 'numeric',
+                      })}
+                    </span>
                   </td>
                   <td>
                     <div className="flex flex-wrap gap-2">
