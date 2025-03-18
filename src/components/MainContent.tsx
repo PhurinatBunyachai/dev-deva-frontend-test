@@ -16,6 +16,7 @@ export default function MainContent() {
   const [headers, setHeader] = useState<Header[]>([]);
   const [items, setItem] = useState<Item[]>([]);
   const [searchWord, setSearch] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
   useEffect(() => {
     const defaultHeaders = [
       { key: 'profile_picture', name: 'Profile Picture' },
@@ -27,16 +28,30 @@ export default function MainContent() {
     ];
 
     setHeader(defaultHeaders);
-    setItem([
-      {
-        profile_picture: '',
-        first_name: 'first_name',
-        last_name: 'last_name',
-        gender: 'Male',
-        birthday: new Date(),
-      },
-    ]);
+    const onInitData = async () => {
+      setLoading(true);
+      await onGetUsers();
+      setLoading(false);
+    };
+    onInitData();
   }, []);
+
+  const onGetUsers = async () => {
+    try {
+      const response = await fetch(`${import.meta.env.APP_BACKEND_URL}api/users`);
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const { users } = await response.json();
+      console.log(users);
+      setItem(users);
+    } catch (error) {
+      console.log(error);
+      // setError(error);
+    } finally {
+      // setLoading(false);
+    }
+  };
   const onSearch = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { value } = e.target;
     setSearch(value);
@@ -95,37 +110,60 @@ export default function MainContent() {
               ))}
             </tr>
           </thead>
-          <tbody>
-            {items.map((item, index) => (
-              <tr key={index}>
-                <td>
-                  <div className="avatar avatar-placeholder">
-                    <div className="bg-blue-600 text-neutral-content w-10 rounded-full">
-                      <span className="text-white">D</span>
-                    </div>
-                  </div>
-                </td>
-                <td>
-                  <span>{item.first_name}</span>
-                </td>
-                <td>
-                  <span>{item.last_name}</span>
-                </td>
-                <td>
-                  <span>{item.gender}</span>
-                </td>
-                <td>
-                  <span>{item.birthday.toLocaleDateString()}</span>
-                </td>
-                <td>
-                  <div className="flex flex-wrap gap-2">
-                    <button className="btn btn-warning text-white">Edit</button>
-                    <button className="btn btn-error text-white">Delete</button>
-                  </div>
+          {loading && (
+            <tbody>
+              <tr>
+                <td colSpan={headers.length} className="text-center">
+                  {Array.from({ length: 5 }).map((_, index) => (
+                    <div key={index} className="skeleton h-[50px] w-full mt-2"></div>
+                  ))}
                 </td>
               </tr>
-            ))}
-          </tbody>
+            </tbody>
+          )}
+
+          {!loading && items.length <= 0 && (
+            <tbody>
+              <tr>
+                <td colSpan={headers.length} className="text-center">
+                  No data found
+                </td>
+              </tr>
+            </tbody>
+          )}
+          {!loading && items.length > 0 && (
+            <tbody>
+              {items.map((item, index) => (
+                <tr key={index}>
+                  <td>
+                    <div className="avatar avatar-placeholder">
+                      <div className="bg-blue-600 text-neutral-content w-10 rounded-full">
+                        <span className="text-white">D</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <span>{item.first_name}</span>
+                  </td>
+                  <td>
+                    <span>{item.last_name}</span>
+                  </td>
+                  <td>
+                    <span>{item.gender}</span>
+                  </td>
+                  <td>
+                    <span>{item.birthday.toLocaleDateString()}</span>
+                  </td>
+                  <td>
+                    <div className="flex flex-wrap gap-2">
+                      <button className="btn btn-warning text-white">Edit</button>
+                      <button className="btn btn-error text-white">Delete</button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          )}
         </table>
       </div>
     </div>
