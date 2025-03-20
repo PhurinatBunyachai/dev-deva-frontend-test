@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import SearchInput from '@/components/SearchInput';
 interface Header {
   key: string;
   name: string;
@@ -123,30 +124,12 @@ export default function MainContent() {
     <div className="max-w-[1280px] mx-auto px-2">
       <div className="flex items-center justify-between mt-5 w-full">
         <div>User List</div>
-        <div className="flex items-center gap-1 basis-2/3">
-          <label className="input w-full">
-            <input
-              type="search"
-              className="grow"
-              placeholder="Search"
-              value={searchWord}
-              onChange={onSearch}
-              onKeyDown={onEnter}
-            />
-            <kbd className="kbd kbd-sm">Enter</kbd>
-          </label>
-          <svg
-            className="h-[1.5rem] cursor-pointer invisible md:visible"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            onClick={onSearchSubmit}
-          >
-            <g fill="none" stroke="currentColor">
-              <circle cx="11" cy="11" r="8"></circle>
-              <path d="m21 21-4.3-4.3"></path>
-            </g>
-          </svg>
-        </div>
+        <SearchInput
+          searchWord={searchWord}
+          onSearch={onSearch}
+          onEnter={onEnter}
+          onSearchSubmit={onSearchSubmit}
+        />
         <div>
           <button
             className="btn btn-active btn-info text-white"
