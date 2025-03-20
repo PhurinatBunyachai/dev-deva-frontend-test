@@ -1,13 +1,6 @@
 import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-
-interface UserFormData {
-  profile_picture: string;
-  first_name: string;
-  last_name: string;
-  gender: string;
-  birthday: Date | null;
-}
+import type { UserFormData } from '@/types';
 
 export default function AddUser() {
   const navigate = useNavigate();

@@ -1,18 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SearchInput from '@/components/SearchInput';
-interface Header {
-  key: string;
-  name: string;
-}
-interface Item {
-  id: number;
-  image: string;
-  firstName: string;
-  lastName: string;
-  gender: string;
-  birthDate: Date;
-}
+import type { Header, Item } from '@/types';
+
 export default function MainContent() {
   const navigate = useNavigate();
   const [headers, setHeader] = useState<Header[]>([]);
